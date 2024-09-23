@@ -1,0 +1,56 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pm2.log
+
+# Dependency directories
+node_modules/
+jspm_packages/
+
+# Environment variable files
+.env
+
+# Build directories
+dist/
+build/
+
+# Cache and temporary files
+npm-cache/
+*.cache
+*.tmp
+*.swp
+
+# OS-generated files
+.DS_Store
+Thumbs.db
+
+# Debugger output
+*.pid
+*.seed
+
+# IDE-specific directories and files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Coverage directory for testing
+coverage/
+
+# Optional npm cache directory
+.npm/
+
+# Optional eslint cache
+.eslintcache
+
+# Optional REPL history
+.node_repl_history
+
+# Miscellaneous
+*.log
+*.out
+*.log.*
+*.gz
