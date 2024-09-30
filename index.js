@@ -1,6 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const authRoutes = require('./controllers/auth');
+const studentRoutes = require('./controllers/student');
 const cors = require('cors');
 
 const app = express();
@@ -20,7 +21,11 @@ mongoose
     console.error('MongoDB connection error:', err);
   });
 
+// API routes
 app.use('/api/auth', authRoutes);
+
+// student routes
+app.use('/api/student', studentRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);

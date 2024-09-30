@@ -3,6 +3,8 @@ const jwt = require('jsonwebtoken'); // Import the user model
 const { register, login } = require('../services/authService');
 
 const router = express.Router();
+
+// User registration route
 router.post('/register', register);
 
 // User login route
