@@ -1,6 +1,10 @@
 const mongoose = require('mongoose');
 
-const userSchema = new mongoose.Schema({
+const studentSchema = new mongoose.Schema({
+  student_image: {
+    type: String,
+    // required: true,
+  },
   name: {
     type: String,
     required: true,
@@ -15,6 +19,6 @@ const userSchema = new mongoose.Schema({
   },
 });
 
-const User = mongoose.model('Student', userSchema);
+const User = mongoose.model('Student', studentSchema);
 
 module.exports = User;

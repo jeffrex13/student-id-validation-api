@@ -1,17 +1,26 @@
 const express = require('express');
 const router = express.Router();
-const Student = require('../models/Student'); // Import the User model
+const multer = require('multer');
+const {
+  uploadStudents,
+  getAllStudents,
+} = require('../services/studentService');
 
-// Endpoint to get all users
-router.get('/', async (req, res) => {
-  try {
-    const users = await Student.find(); // Fetch all users from the database
-    res.json(users);
-  } catch (err) {
-    res
-      .status(500)
-      .json({ message: 'Error fetching students', error: err.message });
-  }
+// Set up multer for file uploads
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, './uploads/');
+  },
+  filename: (req, file, cb) => {
+    cb(null, file.originalname);
+  },
 });
+const upload = multer({ storage: storage });
+
+// get all students
+router.get('/', getAllStudents);
+
+// uploading student data along with images
+router.post('/upload', upload.single('file'), uploadStudents);
 
 module.exports = router;
