@@ -3,7 +3,6 @@ const mongoose = require('mongoose');
 const studentSchema = new mongoose.Schema({
   student_image: {
     type: String,
-    // required: true,
   },
   name: {
     type: String,
@@ -11,11 +10,9 @@ const studentSchema = new mongoose.Schema({
   },
   tup_id: {
     type: String,
-    // required: true,
   },
   school_year: {
     type: String,
-    // required: true,
   },
 });
 
