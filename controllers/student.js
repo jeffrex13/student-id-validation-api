@@ -4,6 +4,9 @@ const multer = require('multer');
 const {
   uploadStudents,
   getAllStudents,
+  getAllStudentsByCourse,
+  updateStudent,
+  deleteStudent,
 } = require('../services/studentService');
 
 // Set up multer for file uploads
@@ -19,6 +22,15 @@ const upload = multer({ storage: storage });
 
 // get all students
 router.get('/', getAllStudents);
+
+// get all students by course
+router.get('/:course', getAllStudentsByCourse);
+
+// Update a student by course and studentId
+router.put('/:course/:studentId', updateStudent);
+
+// Delete a student by course and studentId
+router.delete('/:course/:studentId', deleteStudent);
 
 // uploading student data along with images
 router.post('/upload', upload.single('file'), uploadStudents);

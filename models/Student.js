@@ -14,8 +14,11 @@ const studentSchema = new mongoose.Schema({
   school_year: {
     type: String,
   },
+  course: {
+    type: String,
+  },
 });
 
-const User = mongoose.model('Student', studentSchema);
+const Student = mongoose.model('Student', studentSchema);
 
-module.exports = User;
+module.exports = Student;
