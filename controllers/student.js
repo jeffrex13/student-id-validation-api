@@ -1,38 +1,142 @@
 const express = require('express');
-const router = express.Router();
 const multer = require('multer');
-const {
-  uploadStudents,
-  getAllStudents,
-  getAllStudentsByCourse,
-  updateStudent,
-  deleteStudent,
-} = require('../services/studentService');
+const path = require('path');
 
-// Set up multer for file uploads
+const studentService = require('../services/studentService');
+
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, './uploads/');
+  destination: function (req, file, cb) {
+    cb(null, 'uploads/');
   },
-  filename: (req, file, cb) => {
-    cb(null, file.originalname);
+  filename: function (req, file, cb) {
+    cb(
+      null,
+      file.fieldname + '-' + Date.now() + path.extname(file.originalname),
+    );
   },
 });
-const upload = multer({ storage: storage });
 
-// get all students
-router.get('/', getAllStudents);
+const fileFilter = (req, file, cb) => {
+  const ext = path.extname(file.originalname).toLowerCase();
+  if (ext === '.csv' || ext === '.xlsx') {
+    cb(null, true);
+  } else {
+    cb(new Error('Only CSV and XLSX files are allowed.'), false);
+  }
+};
 
-// get all students by course
-router.get('/:course', getAllStudentsByCourse);
+const upload = multer({
+  storage: storage,
+  fileFilter: fileFilter,
+});
 
-// Update a student by course and studentId
-router.put('/:course/:studentId', updateStudent);
+const studentController = {
+  getAllStudents: async (req, res) => {
+    try {
+      const allStudents = await studentService.getAllStudents();
+      res.json(allStudents);
+    } catch (err) {
+      res
+        .status(500)
+        .json({ message: 'Error fetching students', error: err.message });
+    }
+  },
 
-// Delete a student by course and studentId
-router.delete('/:course/:studentId', deleteStudent);
+  getAllStudentsByCourse: async (req, res) => {
+    const course = req.params.course || req.query.course;
 
-// uploading student data along with images
-router.post('/upload', upload.single('file'), uploadStudents);
+    if (!course) {
+      return res.status(400).json({ message: 'Course parameter is required.' });
+    }
 
-module.exports = router;
+    try {
+      const users = await studentService.getAllStudentsByCourse(course);
+      res.json(users);
+    } catch (err) {
+      const statusCode = err.statusCode || 500;
+      res.status(statusCode).json({ message: err.message });
+    }
+  },
+
+  uploadStudents: [
+    upload.single('file'),
+    async (req, res) => {
+      const course = req.params.course || req.body.course || req.query.course;
+
+      if (!course) {
+        return res
+          .status(400)
+          .json({ message: 'Course parameter is required.' });
+      }
+
+      if (!req.file) {
+        return res.status(400).json({ message: 'No file uploaded.' });
+      }
+
+      try {
+        const result = await studentService.uploadStudents(
+          course,
+          req.file.path,
+        );
+        res.json(result);
+      } catch (error) {
+        res.status(500).json({ message: error.message });
+      }
+    },
+  ],
+
+  updateStudent: async (req, res) => {
+    const course = req.params.course; // Assuming the course is passed as a URL parameter
+    const studentId = req.params.id; // Student ID from the URL
+    const updateData = req.body; // The data to update from the request body
+
+    if (!course) {
+      return res.status(400).json({ message: 'Course parameter is required.' });
+    }
+
+    if (!studentId) {
+      return res.status(400).json({ message: 'Student ID is required.' });
+    }
+
+    try {
+      const result = await studentService.updateStudent(
+        course,
+        studentId,
+        updateData,
+      );
+      res.json(result);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  },
+};
+
+module.exports = studentController;
+
+// // Set up multer for file uploads
+// const storage = multer.diskStorage({
+//   destination: (req, file, cb) => {
+//     cb(null, './uploads/');
+//   },
+//   filename: (req, file, cb) => {
+//     cb(null, file.originalname);
+//   },
+// });
+// const upload = multer({ storage: storage });
+
+// // get all students
+// router.get('/', getAllStudents);
+
+// // get all students by course
+// router.get('/:course', getAllStudentsByCourse);
+
+// // Update a student by course and studentId
+// router.put('/:course/:studentId', updateStudent);
+
+// // Delete a student by course and studentId
+// router.delete('/:course/:studentId', deleteStudent);
+
+// // uploading student data along with images
+// router.post('/upload', upload.single('file'), uploadStudents);
+
+// module.exports = router;

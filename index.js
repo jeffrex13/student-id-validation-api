@@ -1,7 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const authRoutes = require('./controllers/auth');
-const studentRoutes = require('./controllers/student');
+const studentRoutes = require('./routes/studentRoutes');
 const cors = require('cors');
 
 const app = express();

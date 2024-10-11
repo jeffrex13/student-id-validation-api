@@ -17,6 +17,10 @@ const studentSchema = new mongoose.Schema({
   course: {
     type: String,
   },
+  validated: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const Student = mongoose.model('Student', studentSchema);
