@@ -109,6 +109,16 @@ const studentController = {
       res.status(500).json({ message: error.message });
     }
   },
+
+  getTupIdByValue: async (req, res) => {
+    const value = req.params.value;
+    try {
+      const result = await studentService.getTupIdByValue(value);
+      res.json(result);
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  },
 };
 
 module.exports = studentController;

@@ -98,7 +98,7 @@ const studentService = {
       const result = await mongoose.connection.db
         .collection(collectionName)
         .updateOne(
-          { _id: new mongoose.Types.ObjectId(studentId) },
+          { _id: mongoose.Types.ObjectId.createFromHexString(studentId) },
           { $set: updateData },
         );
 
@@ -112,6 +112,25 @@ const studentService = {
     } catch (error) {
       throw new Error(`Error updating student: ${error.message}`);
     }
+  },
+  // New method to fetch tup_id based on a given value
+  getTupIdByValue: async (tupId) => {
+    const collections = await mongoose.connection.db
+      .listCollections()
+      .toArray();
+    const foundTupIds = [];
+
+    for (const { name } of collections) {
+      if (name.endsWith('_students')) {
+        const students = await mongoose.connection
+          .collection(name)
+          .find({ tup_id: tupId }, { tup_id: 1 })
+          .toArray();
+        foundTupIds.push(...students.map((student) => student.tup_id));
+      }
+    }
+
+    return foundTupIds;
   },
 };
 
@@ -203,56 +222,6 @@ const studentService = {
 //     if (file) fs.unlinkSync(file.path);
 //   }
 // };
-
-const updateStudent = async (req, res) => {
-  const { course, studentId } = req.params; // Get course and studentId from URL parameters
-  const collectionName = `${course}_students`; // Define collection name based on course
-
-  try {
-    const updatedStudent = await Student.db
-      .collection(collectionName)
-      .findOneAndUpdate(
-        { studentId }, // Find the student by studentId
-        { $set: req.body }, // Update the fields provided in the request body
-        { returnOriginal: false }, // Return the updated document
-      );
-
-    if (!updatedStudent.value) {
-      return res.status(404).json({
-        message: `Student with ID ${studentId} not found in course ${course}.`,
-      });
-    }
-    res.json(updatedStudent.value); // Send the updated student as the response
-  } catch (err) {
-    res
-      .status(500)
-      .json({ message: 'Error updating student', error: err.message });
-  }
-};
-
-const deleteStudent = async (req, res) => {
-  const { course, studentId } = req.params; // Get course and studentId from URL parameters
-  const collectionName = `${course}_students`; // Define collection name based on course
-
-  try {
-    const result = await Student.db
-      .collection(collectionName)
-      .deleteOne({ studentId }); // Delete the student by studentId
-
-    if (result.deletedCount === 0) {
-      return res.status(404).json({
-        message: `Student with ID ${studentId} not found in course ${course}.`,
-      });
-    }
-    res.status(200).json({
-      message: `Student with ID ${studentId} has been deleted successfully.`,
-    });
-  } catch (err) {
-    res
-      .status(500)
-      .json({ message: 'Error deleting student', error: err.message });
-  }
-};
 
 // module.exports = {
 //   getAllStudentsByCourse,
