@@ -111,10 +111,17 @@ const studentController = {
   },
 
   getTupIdByValue: async (req, res) => {
-    const value = req.params.value;
+    const { tupId } = req.params; // Get tup_id from request parameters
     try {
-      const result = await studentService.getTupIdByValue(value);
-      res.json(result);
+      const foundTupIds = await studentService.getTupIdByValue(tupId);
+
+      console.log(foundTupIds);
+
+      if (foundTupIds.length > 0) {
+        return res.status(200).json({ message: 'Student exists.' });
+      } else {
+        return res.status(404).json({ message: 'Student does not exist.' });
+      }
     } catch (error) {
       res.status(500).json({ message: error.message });
     }

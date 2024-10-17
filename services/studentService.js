@@ -115,6 +115,7 @@ const studentService = {
   },
   // New method to fetch tup_id based on a given value
   getTupIdByValue: async (tupId) => {
+    console.log(tupId);
     const collections = await mongoose.connection.db
       .listCollections()
       .toArray();
@@ -130,7 +131,8 @@ const studentService = {
       }
     }
 
-    return foundTupIds;
+    // Filter out null or undefined values
+    return foundTupIds.filter((id) => id != null);
   },
 };
 

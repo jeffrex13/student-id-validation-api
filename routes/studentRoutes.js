@@ -11,6 +11,6 @@ router.patch('/:course/:id', studentController.updateStudent);
 // router.patch('/:course/:studentId', studentController.updateStudent);
 // router.delete('/:course/:studentId', studentController.deleteStudent);
 router.post('/upload', studentController.uploadStudents);
-router.get('/tupId/:value', studentController.getTupIdByValue);
+router.get('/tup_ids/:tupId', studentController.getTupIdByValue);
 
 module.exports = router;
