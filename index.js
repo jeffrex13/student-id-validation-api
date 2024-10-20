@@ -22,6 +22,10 @@ mongoose
     console.error('MongoDB connection error:', err);
   });
 
+app.get('/', (req, res) => {
+  res.send('Hello, World!');
+});
+
 // API routes
 app.use('/api/auth', authRoutes);
 
