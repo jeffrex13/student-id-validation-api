@@ -17,7 +17,7 @@ const studentSchema = new mongoose.Schema({
   course: {
     type: String,
   },
-  validated: {
+  isValid: {
     type: Boolean,
     default: false,
   },

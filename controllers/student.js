@@ -90,6 +90,11 @@ const studentController = {
     const studentId = req.params.id; // Student ID from the URL
     const updateData = req.body; // The data to update from the request body
 
+    console.log(
+      `Course: ${course}, Student ID: ${studentId}, Update Data:`,
+      updateData,
+    );
+
     if (!course) {
       return res.status(400).json({ message: 'Course parameter is required.' });
     }
@@ -106,6 +111,7 @@ const studentController = {
       );
       res.json(result);
     } catch (error) {
+      console.error('Error updating student:', error);
       res.status(500).json({ message: error.message });
     }
   },
@@ -118,9 +124,9 @@ const studentController = {
       console.log(foundTupIds);
 
       if (foundTupIds.length > 0) {
-        return res.status(200).json({ message: 'Student exists.' });
+        return res.status(200).json({ message: 'Valid Student found.' });
       } else {
-        return res.status(404).json({ message: 'Student does not exist.' });
+        return res.status(404).json({ message: 'No valid student found.' });
       }
     } catch (error) {
       res.status(500).json({ message: error.message });
