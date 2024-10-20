@@ -124,9 +124,9 @@ const studentController = {
       console.log(foundTupIds);
 
       if (foundTupIds.length > 0) {
-        return res.status(200).json({ message: 'Valid Student found.' });
+        return res.status(200).json({ message: 'Valid Student ID found.' });
       } else {
-        return res.status(404).json({ message: 'No valid student found.' });
+        return res.status(404).json({ message: 'No valid student ID found.' });
       }
     } catch (error) {
       res.status(500).json({ message: error.message });
