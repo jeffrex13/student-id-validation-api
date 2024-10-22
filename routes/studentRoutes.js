@@ -6,7 +6,7 @@ const studentController = require('../controllers/student');
 // Define routes
 router.get('/', studentController.getAllStudents);
 router.get('/:course', studentController.getAllStudentsByCourse);
-router.patch('/:course/:id', studentController.updateStudent);
+router.patch('/:id', studentController.updateStudent);
 
 // router.patch('/:course/:studentId', studentController.updateStudent);
 // router.delete('/:course/:studentId', studentController.deleteStudent);

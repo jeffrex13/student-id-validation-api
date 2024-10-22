@@ -86,35 +86,54 @@ const studentController = {
   ],
 
   updateStudent: async (req, res) => {
-    const course = req.params.course; // Assuming the course is passed as a URL parameter
     const studentId = req.params.id; // Student ID from the URL
     const updateData = req.body; // The data to update from the request body
 
-    console.log(
-      `Course: ${course}, Student ID: ${studentId}, Update Data:`,
-      updateData,
-    );
-
-    if (!course) {
-      return res.status(400).json({ message: 'Course parameter is required.' });
-    }
+    console.log(`Student ID: ${studentId}, Update Data:`, updateData);
 
     if (!studentId) {
       return res.status(400).json({ message: 'Student ID is required.' });
     }
 
     try {
-      const result = await studentService.updateStudent(
-        course,
-        studentId,
-        updateData,
-      );
+      const result = await studentService.updateStudent(studentId, updateData);
       res.json(result);
     } catch (error) {
       console.error('Error updating student:', error);
       res.status(500).json({ message: error.message });
     }
   },
+
+  // updateStudent: async (req, res) => {
+  //   const course = req.params.course; // Assuming the course is passed as a URL parameter
+  //   const studentId = req.params.id; // Student ID from the URL
+  //   const updateData = req.body; // The data to update from the request body
+
+  //   console.log(
+  //     `Course: ${course}, Student ID: ${studentId}, Update Data:`,
+  //     updateData,
+  //   );
+
+  //   if (!course) {
+  //     return res.status(400).json({ message: 'Course parameter is required.' });
+  //   }
+
+  //   if (!studentId) {
+  //     return res.status(400).json({ message: 'Student ID is required.' });
+  //   }
+
+  //   try {
+  //     const result = await studentService.updateStudent(
+  //       course,
+  //       studentId,
+  //       updateData,
+  //     );
+  //     res.json(result);
+  //   } catch (error) {
+  //     console.error('Error updating student:', error);
+  //     res.status(500).json({ message: error.message });
+  //   }
+  // },
 
   getTupIdByValue: async (req, res) => {
     const { tupId } = req.params; // Get tup_id from request parameters

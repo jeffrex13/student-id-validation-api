@@ -91,8 +91,12 @@ const studentService = {
     }
   },
 
-  updateStudent: async (course, studentId, updateData) => {
-    const collectionName = `${course.toLowerCase()}_students`; // Determine the collection based on the course
+  updateStudent: async (studentId, updateData) => {
+    const collections = await mongoose.connection.db
+      .listCollections()
+      .toArray(); // Get all collections
+    let studentExists = null;
+    let collectionName = '';
 
     try {
       // Validate the student ID
@@ -103,19 +107,22 @@ const studentService = {
       // Convert the student ID to ObjectId
       const objectId = new mongoose.Types.ObjectId(studentId);
 
-      console.log(objectId);
+      // Loop through collections to find the student
+      for (const { name } of collections) {
+        if (name.endsWith('_students')) {
+          studentExists = await mongoose.connection.db
+            .collection(name)
+            .findOne({ _id: objectId });
 
-      // Check if the student exists
-      const studentExists = await mongoose.connection.db
-        .collection(collectionName)
-        .findOne({ _id: objectId });
-
-      console.log(studentExists);
+          if (studentExists) {
+            collectionName = name; // Store the collection name if student is found
+            break; // Exit loop if student is found
+          }
+        }
+      }
 
       if (!studentExists) {
-        throw new Error(
-          'Student not found in the specified course collection.',
-        );
+        throw new Error('Student not found in any course collection.');
       }
 
       // Perform the update
@@ -130,12 +137,58 @@ const studentService = {
 
       return {
         message: 'Student updated successfully.',
-        updatedStudent: result.value,
+        updatedStudent: { ...studentExists, ...updateData }, // Return the updated student data
       };
     } catch (error) {
       throw new Error(`Error updating student: ${error.message}`);
     }
   },
+
+  // updateStudent: async (course, studentId, updateData) => {
+  //   const collectionName = `${course.toLowerCase()}_students`; // Determine the collection based on the course
+
+  //   try {
+  //     // Validate the student ID
+  //     if (!mongoose.Types.ObjectId.isValid(studentId)) {
+  //       throw new Error('Invalid student ID format.');
+  //     }
+
+  //     // Convert the student ID to ObjectId
+  //     const objectId = new mongoose.Types.ObjectId(studentId);
+
+  //     console.log(objectId);
+
+  //     // Check if the student exists
+  //     const studentExists = await mongoose.connection.db
+  //       .collection(collectionName)
+  //       .findOne({ _id: objectId });
+
+  //     console.log(studentExists);
+
+  //     if (!studentExists) {
+  //       throw new Error(
+  //         'Student not found in the specified course collection.',
+  //       );
+  //     }
+
+  //     // Perform the update
+  //     const result = await mongoose.connection.db
+  //       .collection(collectionName)
+  //       .updateOne({ _id: objectId }, { $set: updateData });
+
+  //     // Check if the update was successful
+  //     if (result.modifiedCount === 0) {
+  //       throw new Error('No changes made to the student record.');
+  //     }
+
+  //     return {
+  //       message: 'Student updated successfully.',
+  //       updatedStudent: result.value,
+  //     };
+  //   } catch (error) {
+  //     throw new Error(`Error updating student: ${error.message}`);
+  //   }
+  // },
 
   // fetch tup_id based on a given value
   getTupIdByValue: async (tupId) => {
