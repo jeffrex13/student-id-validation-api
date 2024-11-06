@@ -1,6 +1,5 @@
 const express = require('express');
 const router = express.Router();
-// const multer = require('multer');
 const studentController = require('../controllers/student');
 
 // Define routes
@@ -12,5 +11,11 @@ router.patch('/:id', studentController.updateStudent);
 // router.delete('/:course/:studentId', studentController.deleteStudent);
 router.post('/upload', studentController.uploadStudents);
 router.get('/tup_ids/:tupId', studentController.getTupIdByValue);
+
+// Add new route for adding a single student
+router.post('/:course', studentController.addStudent);
+
+// Add delete route
+router.delete('/:id', studentController.deleteStudent);
 
 module.exports = router;

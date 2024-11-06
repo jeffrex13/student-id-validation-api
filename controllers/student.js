@@ -1,4 +1,3 @@
-const express = require('express');
 const multer = require('multer');
 const path = require('path');
 
@@ -104,37 +103,6 @@ const studentController = {
     }
   },
 
-  // updateStudent: async (req, res) => {
-  //   const course = req.params.course; // Assuming the course is passed as a URL parameter
-  //   const studentId = req.params.id; // Student ID from the URL
-  //   const updateData = req.body; // The data to update from the request body
-
-  //   console.log(
-  //     `Course: ${course}, Student ID: ${studentId}, Update Data:`,
-  //     updateData,
-  //   );
-
-  //   if (!course) {
-  //     return res.status(400).json({ message: 'Course parameter is required.' });
-  //   }
-
-  //   if (!studentId) {
-  //     return res.status(400).json({ message: 'Student ID is required.' });
-  //   }
-
-  //   try {
-  //     const result = await studentService.updateStudent(
-  //       course,
-  //       studentId,
-  //       updateData,
-  //     );
-  //     res.json(result);
-  //   } catch (error) {
-  //     console.error('Error updating student:', error);
-  //     res.status(500).json({ message: error.message });
-  //   }
-  // },
-
   getTupIdByValue: async (req, res) => {
     const { tupId } = req.params; // Get tup_id from request parameters
     try {
@@ -151,34 +119,40 @@ const studentController = {
       res.status(500).json({ message: error.message });
     }
   },
+
+  addStudent: async (req, res) => {
+    const { course } = req.params;
+    const studentData = req.body;
+
+    if (!course) {
+      return res.status(400).json({ message: 'Course parameter is required.' });
+    }
+
+    try {
+      const result = await studentService.addStudent(course, studentData);
+      res.status(201).json(result);
+    } catch (error) {
+      res.status(400).json({ message: error.message });
+    }
+  },
+
+  deleteStudent: async (req, res) => {
+    const studentId = req.params.id;
+
+    if (!studentId) {
+      return res.status(400).json({ message: 'Student ID is required.' });
+    }
+
+    try {
+      const result = await studentService.deleteStudent(studentId);
+      res.json(result);
+    } catch (error) {
+      console.error('Error deleting student:', error);
+      res
+        .status(error.message.includes('not found') ? 404 : 500)
+        .json({ message: error.message });
+    }
+  },
 };
 
 module.exports = studentController;
-
-// // Set up multer for file uploads
-// const storage = multer.diskStorage({
-//   destination: (req, file, cb) => {
-//     cb(null, './uploads/');
-//   },
-//   filename: (req, file, cb) => {
-//     cb(null, file.originalname);
-//   },
-// });
-// const upload = multer({ storage: storage });
-
-// // get all students
-// router.get('/', getAllStudents);
-
-// // get all students by course
-// router.get('/:course', getAllStudentsByCourse);
-
-// // Update a student by course and studentId
-// router.put('/:course/:studentId', updateStudent);
-
-// // Delete a student by course and studentId
-// router.delete('/:course/:studentId', deleteStudent);
-
-// // uploading student data along with images
-// router.post('/upload', upload.single('file'), uploadStudents);
-
-// module.exports = router;

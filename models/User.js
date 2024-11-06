@@ -16,6 +16,9 @@ const userSchema = new mongoose.Schema({
     enum: ['Super Admin', 'Admin'],
     // required: true,
   },
+  profile_image: {
+    type: String,
+  },
 });
 
 // Hash the password before saving
