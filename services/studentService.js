@@ -37,17 +37,33 @@ const studentService = {
     }
   },
 
-  getAllStudentsByCourse: async (course) => {
+  getAllStudentsByCourse: async (course, searchQuery = '') => {
     const collectionName = `${course.toLowerCase()}_students`;
 
     try {
+      let query = {};
+
+      // If search query is provided, create a flexible search criteria
+      if (searchQuery) {
+        query = {
+          $or: [
+            { tup_id: { $regex: searchQuery, $options: 'i' } },
+            { name: { $regex: searchQuery, $options: 'i' } },
+          ],
+        };
+      }
+
       const users = await mongoose.connection.db
         .collection(collectionName)
-        .find()
+        .find(query)
         .toArray();
 
       if (!users.length) {
-        throw new CourseNotFoundError(course);
+        throw new CourseNotFoundError(
+          searchQuery
+            ? `No students found in ${course} matching '${searchQuery}'`
+            : course,
+        );
       }
 
       return users;

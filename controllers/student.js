@@ -43,13 +43,14 @@ const studentController = {
 
   getAllStudentsByCourse: async (req, res) => {
     const course = req.params.course || req.query.course;
+    const search = req.query.search || ''; // Get search query from query parameters
 
     if (!course) {
       return res.status(400).json({ message: 'Course parameter is required.' });
     }
 
     try {
-      const users = await studentService.getAllStudentsByCourse(course);
+      const users = await studentService.getAllStudentsByCourse(course, search);
       res.json(users);
     } catch (err) {
       const statusCode = err.statusCode || 500;
