@@ -151,9 +151,9 @@ const studentService = {
       // }
 
       if (newStudents.length === 0) {
-        return {
-          message: `No new students were uploaded. All ${results.length} students already exist.`,
-        };
+        throw new Error(
+          `Upload failed: All ${results.length} students in the file already exist`,
+        );
       }
 
       await collection.insertMany(newStudents);
