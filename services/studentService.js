@@ -407,6 +407,87 @@ const studentService = {
       throw new Error(`Error deleting student: ${error.message}`);
     }
   },
+
+  deleteMultipleStudents: async (studentIds) => {
+    try {
+      // Validate input
+      if (!Array.isArray(studentIds) || studentIds.length === 0) {
+        throw new Error('Please provide an array of student IDs to delete.');
+      }
+
+      console.log('Received student IDs:', studentIds);
+
+      // Convert all IDs to ObjectId and validate format
+      const objectIds = studentIds.map((id) => {
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+          console.error(`Invalid student ID format: ${id}`); // Log the invalid ID
+          throw new Error(`Invalid student ID format: ${id}`);
+        }
+        return new mongoose.Types.ObjectId(id);
+      });
+
+      const collections = await mongoose.connection.db
+        .listCollections()
+        .toArray();
+
+      let deletedCount = 0;
+      const deletedStudents = [];
+      const notFoundIds = [...objectIds];
+
+      // Search through all student collections
+      for (const { name } of collections) {
+        if (name.endsWith('_students')) {
+          // Find students by _id
+          const studentsToDelete = await mongoose.connection.db
+            .collection(name)
+            .find({
+              _id: { $in: objectIds }, // Using _id for lookup
+            })
+            .toArray();
+
+          if (studentsToDelete.length > 0) {
+            // Delete students by _id
+            const result = await mongoose.connection.db
+              .collection(name)
+              .deleteMany({
+                _id: { $in: studentsToDelete.map((s) => s._id) }, // Using _id for deletion
+              });
+
+            deletedCount += result.deletedCount;
+            deletedStudents.push(...studentsToDelete);
+
+            // Remove found IDs from notFoundIds
+            studentsToDelete.forEach((student) => {
+              const index = notFoundIds.findIndex((id) =>
+                id.equals(student._id),
+              );
+              if (index !== -1) {
+                notFoundIds.splice(index, 1);
+              }
+            });
+          }
+        }
+      }
+
+      if (deletedCount === 0) {
+        throw new Error('No students were found with the provided IDs.');
+      }
+
+      return {
+        message: `Successfully deleted ${deletedCount} student(s).${
+          notFoundIds.length
+            ? ` ${notFoundIds.length} student(s) were not found.`
+            : ''
+        }`,
+        deletedStudents,
+        ...(notFoundIds.length && {
+          notFound: notFoundIds.map((id) => id.toString()),
+        }),
+      };
+    } catch (error) {
+      throw new Error(`Error deleting students: ${error.message}`);
+    }
+  },
 };
 
 module.exports = studentService;

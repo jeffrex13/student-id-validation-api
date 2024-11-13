@@ -154,6 +154,27 @@ const studentController = {
         .json({ message: error.message });
     }
   },
+
+  deleteMultipleStudents: async (req, res) => {
+    const { studentIds } = req.body;
+
+    if (!studentIds || !Array.isArray(studentIds) || studentIds.length === 0) {
+      return res.status(400).json({
+        message: 'Please provide an array of student IDs to delete.',
+      });
+    }
+
+    try {
+      const result = await studentService.deleteMultipleStudents(studentIds);
+      res.json(result);
+    } catch (error) {
+      // console.error('Error deleting multiple students:', error);
+      const statusCode = error.message.includes('No students were found')
+        ? 404
+        : 500;
+      res.status(statusCode).json({ message: error.message });
+    }
+  },
 };
 
 module.exports = studentController;
