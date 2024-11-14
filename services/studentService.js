@@ -47,8 +47,31 @@ const studentService = {
 
   getAllStudents: async () => {
     try {
-      // Fetch all students using the Student model
-      const allStudents = await Student.find(); // This will return all student documents
+      const collections = await mongoose.connection.db
+        .listCollections()
+        .toArray(); // Get all collections
+      const allStudents = []; // Array to hold all students
+
+      // Loop through the collections to fetch students from each
+      for (const { name } of collections) {
+        if (name.endsWith('_students')) {
+          // Check if the collection is a student collection
+          const students = await mongoose.connection.db
+            .collection(name)
+            .find()
+            .toArray(); // Fetch all students from the collection
+
+          // Optionally, you can validate or process the students using the Student model
+          // For example, you could validate each student object against the schema
+          students.forEach((student) => {
+            // You can perform any validation or processing here if needed
+            // For example, you could check if the student has required fields
+            const validStudent = new Student(student); // Create an instance of the Student model
+            // You can perform additional checks or transformations if necessary
+            allStudents.push(validStudent); // Push the validated student to the array
+          });
+        }
+      }
 
       return allStudents; // Return the array of students
     } catch (error) {
