@@ -21,7 +21,7 @@ const studentSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
-  profile_image: {
+  semester: {
     type: String,
   },
 });

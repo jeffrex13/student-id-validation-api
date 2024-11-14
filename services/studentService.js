@@ -294,12 +294,13 @@ const studentService = {
   //       throw new Error('Required fields (tup_id) missing');
   //     }
 
+  //     // Cleanse the TUP ID
+  //     studentData.tup_id = cleanseTupId(studentData.tup_id);
+
   //     // Check if student with same tup_id already exists in the course
   //     const existingStudent = await mongoose.connection.db
   //       .collection(collectionName)
   //       .findOne({ tup_id: studentData.tup_id });
-
-  //     // console.log(existingStudent);
 
   //     if (existingStudent) {
   //       throw new Error(
@@ -329,7 +330,7 @@ const studentService = {
   // },
 
   addStudent: async (course, studentData) => {
-    const collectionName = `${course.toLowerCase()}_students`;
+    const collectionName = `${course.toLowerCase()}_students`; // Construct the collection name
 
     try {
       // Validate if required fields are present
@@ -340,32 +341,48 @@ const studentService = {
       // Cleanse the TUP ID
       studentData.tup_id = cleanseTupId(studentData.tup_id);
 
-      // Check if student with same tup_id already exists in the course
-      const existingStudent = await mongoose.connection.db
-        .collection(collectionName)
-        .findOne({ tup_id: studentData.tup_id });
+      // Check if student with the same tup_id already exists in any course collection
+      const collections = await mongoose.connection.db
+        .listCollections()
+        .toArray();
+      let studentExists = false;
 
-      if (existingStudent) {
+      for (const { name } of collections) {
+        if (name.endsWith('_students')) {
+          const existingStudent = await mongoose.connection.db
+            .collection(name)
+            .findOne({ tup_id: studentData.tup_id });
+
+          if (existingStudent) {
+            studentExists = true;
+            break; // Exit loop if student is found
+          }
+        }
+      }
+
+      if (studentExists) {
         throw new Error(
-          `Student with TUP ID ${studentData.tup_id} already exists in course ${course}`,
+          `Student with TUP ID ${studentData.tup_id} already exists in another course.`,
         );
       }
 
-      // Add default isValid field if not provided
-      const studentToAdd = {
+      // Create a new instance of the Student model
+      const studentToAdd = new Student({
         ...studentData,
         isValid:
           studentData.isValid !== undefined ? studentData.isValid : false,
+        course: course.toLowerCase(), // Ensure the course is set
         createdAt: new Date(),
-      };
+      });
 
+      // Insert the student directly into the appropriate collection
       const result = await mongoose.connection.db
         .collection(collectionName)
-        .insertOne(studentToAdd);
+        .insertOne(studentToAdd.toObject()); // Convert to plain object for insertion
 
       return {
         message: 'Student added successfully',
-        student: { ...studentToAdd, _id: result.insertedId },
+        student: { ...studentToAdd.toObject(), _id: result.insertedId }, // Return the added student data
       };
     } catch (error) {
       throw new Error(`Error adding student: ${error.message}`);
