@@ -175,6 +175,17 @@ const studentController = {
       res.status(statusCode).json({ message: error.message });
     }
   },
+
+  deleteAllStudentsByCourse: async (req, res) => {
+    const { course } = req.params;
+
+    try {
+      const response = await studentService.deleteAllStudentsByCourse(course);
+      return res.status(200).json(response);
+    } catch (error) {
+      return res.status(500).json({ message: error.message });
+    }
+  },
 };
 
 module.exports = studentController;

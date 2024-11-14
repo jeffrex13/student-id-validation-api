@@ -20,5 +20,10 @@ router.post('/:course', studentController.addStudent);
 router.delete('/:id', studentController.deleteStudent);
 // Delete multiple students route
 router.delete('/ids/bulk', studentController.deleteMultipleStudents);
+// Delete all students in a specific course route
+router.delete(
+  '/delete-all/:course',
+  studentController.deleteAllStudentsByCourse,
+);
 
 module.exports = router;

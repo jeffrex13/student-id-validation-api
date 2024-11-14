@@ -359,6 +359,7 @@ const studentService = {
     }
   },
 
+  // delete single student
   deleteStudent: async (studentId) => {
     try {
       // Validate the student ID
@@ -408,6 +409,7 @@ const studentService = {
     }
   },
 
+  // delete multiple student
   deleteMultipleStudents: async (studentIds) => {
     try {
       // Validate input
@@ -486,6 +488,27 @@ const studentService = {
       };
     } catch (error) {
       throw new Error(`Error deleting students: ${error.message}`);
+    }
+  },
+
+  // delete all students in a course
+  deleteAllStudentsByCourse: async (course) => {
+    const collectionName = `${course.toLowerCase()}_students`;
+
+    try {
+      const result = await mongoose.connection.db
+        .collection(collectionName)
+        .deleteMany({});
+      if (result.deletedCount === 0) {
+        throw new Error(`No students found in course ${course} to delete.`);
+      }
+      return {
+        message: `${result.deletedCount} student(s) deleted successfully from course ${course}.`,
+      };
+    } catch (error) {
+      throw new Error(
+        `Error deleting students from course ${course}: ${error.message}`,
+      );
     }
   },
 };
