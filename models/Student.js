@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const studentSchema = new mongoose.Schema({
-  student_image: {
+  profile_image: {
     type: String,
   },
   name: {
@@ -20,6 +20,9 @@ const studentSchema = new mongoose.Schema({
   isValid: {
     type: Boolean,
     default: false,
+  },
+  profile_image: {
+    type: String,
   },
 });
 

@@ -3,6 +3,8 @@ const mongoose = require('mongoose');
 const { parseCSV, parseXLSX } = require('../utils/fileParser');
 const path = require('path');
 
+const Student = require('../models/Student');
+
 class CourseNotFoundError extends Error {
   constructor(course) {
     super(`No students found for course ${course}.`);
@@ -17,25 +19,36 @@ const cleanseTupId = (tupId) => {
 };
 
 const studentService = {
+  // getAllStudents: async () => {
+  //   try {
+  //     // Access the database instance through mongoose.connection
+  //     const collections = await mongoose.connection.db
+  //       .listCollections()
+  //       .toArray();
+
+  //     const allStudents = [];
+
+  //     // Loop through the collections and fetch students from each
+  //     for (const { name } of collections) {
+  //       if (name.endsWith('_students')) {
+  //         const students = await mongoose.connection
+  //           .collection(name)
+  //           .find()
+  //           .toArray();
+  //         allStudents.push(...students);
+  //       }
+  //     }
+
+  //     return allStudents; // Return the array of students
+  //   } catch (error) {
+  //     throw new Error(`Error fetching students: ${error.message}`);
+  //   }
+  // },
+
   getAllStudents: async () => {
     try {
-      // Access the database instance through mongoose.connection
-      const collections = await mongoose.connection.db
-        .listCollections()
-        .toArray();
-
-      const allStudents = [];
-
-      // Loop through the collections and fetch students from each
-      for (const { name } of collections) {
-        if (name.endsWith('_students')) {
-          const students = await mongoose.connection
-            .collection(name)
-            .find()
-            .toArray();
-          allStudents.push(...students);
-        }
-      }
+      // Fetch all students using the Student model
+      const allStudents = await Student.find(); // This will return all student documents
 
       return allStudents; // Return the array of students
     } catch (error) {
