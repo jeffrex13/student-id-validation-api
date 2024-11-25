@@ -64,10 +64,7 @@ const studentService = {
           // Optionally, you can validate or process the students using the Student model
           // For example, you could validate each student object against the schema
           students.forEach((student) => {
-            // You can perform any validation or processing here if needed
-            // For example, you could check if the student has required fields
             const validStudent = new Student(student); // Create an instance of the Student model
-            // You can perform additional checks or transformations if necessary
             allStudents.push(validStudent); // Push the validated student to the array
           });
         }

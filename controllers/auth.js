@@ -1,6 +1,12 @@
 const express = require('express');
 const jwt = require('jsonwebtoken'); // Import the user model
-const { register, login } = require('../services/authService');
+const {
+  register,
+  login,
+  fetchUsers,
+  updateUser,
+  deleteUser,
+} = require('../services/authService');
 
 const router = express.Router();
 
@@ -9,6 +15,11 @@ router.post('/register', register);
 
 // User login route
 router.post('/login', login);
+
+// Fetch users route
+router.get('/users', fetchUsers);
+router.patch('/users/:userId', updateUser); // Route to update user
+router.delete('/users/:userId', deleteUser);
 
 // Token verification middleware
 const authMiddleware = (req, res, next) => {
