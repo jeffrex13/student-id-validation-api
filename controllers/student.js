@@ -186,6 +186,15 @@ const studentController = {
       return res.status(500).json({ message: error.message });
     }
   },
+
+  getValidationStats: async (req, res) => {
+    try {
+      const stats = await studentService.getValidationStats();
+      res.json(stats);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  },
 };
 
 module.exports = studentController;

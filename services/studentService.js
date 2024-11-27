@@ -541,6 +541,64 @@ const studentService = {
       );
     }
   },
+
+  getValidationStats: async () => {
+    try {
+      const collections = await mongoose.connection.db
+        .listCollections()
+        .toArray();
+      const stats = {
+        total: 0,
+        valid: 0,
+        invalid: 0,
+        noValidationField: 0,
+        courseStats: {},
+      };
+
+      for (const { name } of collections) {
+        if (name.endsWith('_students')) {
+          const collection = mongoose.connection.db.collection(name);
+          const courseName = name.replace('_students', '');
+
+          // Initialize course stats
+          stats.courseStats[courseName] = {
+            total: 0,
+            valid: 0,
+            invalid: 0,
+            noValidationField: 0,
+          };
+
+          // Count valid students
+          const validCount = await collection.countDocuments({ isValid: true });
+          stats.valid += validCount;
+          stats.courseStats[courseName].valid = validCount;
+
+          // Count invalid students
+          const invalidCount = await collection.countDocuments({
+            isValid: false,
+          });
+          stats.invalid += invalidCount;
+          stats.courseStats[courseName].invalid = invalidCount;
+
+          // Count students without isValid field
+          const noFieldCount = await collection.countDocuments({
+            isValid: { $exists: false },
+          });
+          stats.noValidationField += noFieldCount;
+          stats.courseStats[courseName].noValidationField = noFieldCount;
+
+          // Calculate total for this course
+          const courseTotal = validCount + invalidCount + noFieldCount;
+          stats.total += courseTotal;
+          stats.courseStats[courseName].total = courseTotal;
+        }
+      }
+
+      return stats;
+    } catch (error) {
+      throw new Error(`Error fetching validation statistics: ${error.message}`);
+    }
+  },
 };
 
 module.exports = studentService;
