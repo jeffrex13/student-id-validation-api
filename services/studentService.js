@@ -19,32 +19,6 @@ const cleanseTupId = (tupId) => {
 };
 
 const studentService = {
-  // getAllStudents: async () => {
-  //   try {
-  //     // Access the database instance through mongoose.connection
-  //     const collections = await mongoose.connection.db
-  //       .listCollections()
-  //       .toArray();
-
-  //     const allStudents = [];
-
-  //     // Loop through the collections and fetch students from each
-  //     for (const { name } of collections) {
-  //       if (name.endsWith('_students')) {
-  //         const students = await mongoose.connection
-  //           .collection(name)
-  //           .find()
-  //           .toArray();
-  //         allStudents.push(...students);
-  //       }
-  //     }
-
-  //     return allStudents; // Return the array of students
-  //   } catch (error) {
-  //     throw new Error(`Error fetching students: ${error.message}`);
-  //   }
-  // },
-
   getAllStudents: async () => {
     try {
       const collections = await mongoose.connection.db
@@ -214,6 +188,12 @@ const studentService = {
       // Cleanse TUP ID if it's being updated
       if (updateData.tup_id) {
         updateData.tup_id = cleanseTupId(updateData.tup_id);
+      }
+      // Handle isValid changes
+      if (updateData.isValid === true) {
+        updateData.dateValidated = new Date();
+      } else if (updateData.isValid === false) {
+        updateData.dateValidated = null; // Set to null to remove the field
       }
 
       // Validate the student ID
