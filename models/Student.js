@@ -27,6 +27,9 @@ const studentSchema = new mongoose.Schema({
   year_level: {
     type: String,
   },
+  dateValidated: {
+    type: String,
+  },
 });
 
 const Student = mongoose.model('Student', studentSchema);
